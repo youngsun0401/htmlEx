@@ -4,6 +4,7 @@
 }
 
 #omokpan {
+    position: relative;
     border: none;
     margin-left: auto;
     margin-right: auto;

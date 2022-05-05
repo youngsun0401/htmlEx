@@ -40,8 +40,6 @@ class Stage {
         }
         //// 오목판 태그
         this.pan = document.getElementById('omokpan');
-        //css로 넣어보자
-        this.pan.style.position = 'relative';
         //// 격자 표시용 테이블을 만들어 자손으로 넣기
         this.grid = document.createElement('table');
         this.grid.style.position = 'absolute';
