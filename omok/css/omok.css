@@ -12,6 +12,7 @@
 }
 
 #omokpan table {
+    position: absolute;
     border-collapse: collapse;
 }
 

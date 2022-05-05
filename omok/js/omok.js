@@ -1,9 +1,7 @@
 scale = 30;// 화면에 표시되는 요소들 기준 크기(오목판 한 칸 크기)
 sus = new Array();// 놓은 수들 차례로 저장하는 배열 (stage.a와 같은 요소를 다른 배열에 저장하는 것)
 //// 각 플레이어 색
-playerColor = new Array(2);
-playerColor[0] = 'black';
-playerColor[1] = 'white';
+var playercolor = ['black', 'white'];
 
 //// 좌표 클래스(x,y가 한 묶음이 아니라서 개짱난다)
 class XY {
@@ -16,7 +14,8 @@ class XY {
 function mousePos(e) {// 마우스위치를 바둑판좌표로 변환. 이 함수는 이벤트리스너에서 그 이벤트를 이 함수의 인자로 넣으면서 호출해야만 한다. 즉 eventHandlerEx(e){… var a = mousePos(e); …}
     return new XY(
         parseInt((e.clientX - stage.pan.getBoundingClientRect().x) / scale)
-        , parseInt((e.clientY - stage.pan.getBoundingClientRect().y) / scale));
+        , parseInt((e.clientY - stage.pan.getBoundingClientRect().y) / scale)
+        );
 }
 
 //// 이번 턴 돌을 놓을 플레이어 = 턴수가 짝수이면 흑, 홀수는 백.
@@ -33,7 +32,9 @@ class Stage {
         //// 가로세로
         this.w = width;
         this.h = height;
+
         //// 2차원 배열 만들기
+        //용도는뭐지
         this.a = new Array(height);
         for (var i = 0; i < height; i++) {
             this.a[i] = new Array(width);
@@ -43,9 +44,8 @@ class Stage {
         this.pan = document.getElementById('omokpan');
         //// 격자 표시용 테이블을 만들어 자손으로 넣기
         this.grid = document.createElement('table');
-        this.grid.style.position = 'absolute';
         this.pan.appendChild(this.grid);
-        for (var i = 0; i < this.h - 1; i++) {// 가로줄을 세로크기만큼 개 만들기
+        for (var vertical = 0; vertical < this.h - 1; vertical++) {// 가로줄을 세로크기만큼 개 만들기
             var tr = document.createElement('tr');
             this.grid.appendChild(tr);
             for (var k = 0; k < this.w - 1; k++) {
@@ -57,16 +57,18 @@ class Stage {
         //// 가운데 표시 점
         this.centerPoint = document.createElement('div');
         this.pan.appendChild(this.centerPoint);
-        this.centerPoint.setAttribute('id','omokpanCenterPoint');
+        this.centerPoint.setAttribute('id', 'omokpanCenterPoint');
 
-        this.restyle();// 초기 스타일
+        // 초기 스타일
+        this.restyle();
 
         //// 이벤트 함수 연결
-        this.pan.onclick = this.stageClick;
+        this.pan.onclick = this.stageClickEvent;
         this.pan.onmouseenter = this.cursorOn;
         this.pan.onmousemove = this.cursorMove;
         this.pan.onmouseleave = this.cursorOff;
     }
+
     //// 스타일 새로고침 함수
     restyle() {
         //// 가운데점
@@ -93,20 +95,22 @@ class Stage {
         stage.pan.appendChild(stage.cursor);
         stage.cursor.className = 'dol cursor';
         stage.cursor.style.position = 'absolute';
-        stage.cursor.style.backgroundColor = playerColor[currentP()];
+        stage.cursor.style.backgroundColor = playercolor[currentP()];
         stage.cursor.style.width = scale + 'px';
         stage.cursor.style.height = scale + 'px';
     }
+
     cursorMove(e) {// 마우스 따라 커서 이동
         stage.cursor.style.top = mousePos(e).y * scale + 'px';
         stage.cursor.style.left = mousePos(e).x * scale + 'px';
     }
+
     cursorOff(e) {// 마우스가 판 밖에 나면 커서 삭제
         stage.cursor.remove();
     }
 
     //// 판 클릭 이벤트
-    stageClick(e) {
+    stageClickEvent(e) {
         if (!stage.playon) return;// 게임 이미 끝나있으면 아무것도 안함
         var x = mousePos(e).x;
         var y = mousePos(e).y;
@@ -116,6 +120,7 @@ class Stage {
         else
             document.getElementById('msg').innerText = '이미 돌이 있는 자리입니다.';//``
     }
+
     //// 돌 놓기
     suup(x, y) {// 돌 놓는 위치(오목판좌표)
         var cp = currentP();// 돌을 놓으면 cP() 저 값이 바뀌어서 뒤처리 시발 개같음
@@ -132,6 +137,7 @@ class Stage {
             alert('비겼습니다.');
         }
     }
+
     //// 한 수 무르기
     sudown() {
         if (sus.length < 1) return;// 무를 수가 없으면 아무것도 안함
@@ -140,13 +146,14 @@ class Stage {
         stage.a[dol.pos.y][dol.pos.x] = null;
         stage.signUpdate();// 표시 갱신
     }
+
     //// 표시 갱신
     signUpdate() {
         //// 상황판 갱신
-        document.getElementById('colorSign').style.backgroundColor = playerColor[currentP()];// 이번에 돌 놓을 플레이어 색
+        document.getElementById('colorSign').style.backgroundColor = playercolor[currentP()];// 이번에 돌 놓을 플레이어 색
         document.getElementById('su').innerText = sus.length + 1;// 몇번째 수인지 표시
         //// 커서 색 갱신
-        stage.cursor.style.backgroundColor = playerColor[currentP()];
+        stage.cursor.style.backgroundColor = playercolor[currentP()];
     }
 
     //// 승패판정하고 처리
@@ -161,6 +168,7 @@ class Stage {
             stage.playon = false;
         }
     }
+
     //// 기준위치에서부터 특정 방향으로 연속된 같은 색 돌의 개수 (기준색과 입력색이 다르면 0)
     acount(p, x, y, xstep, ystep) {// x,y: 기준위치. xystep: 검사할 방향(0,1,-1)
         var n;// 구할 값
@@ -175,6 +183,7 @@ class Stage {
         return n;
     }
 }
+
 //// 바둑돌 클래스
 class Dol {
     constructor(p, x, y) {// p: 어느 플레이어의 돌인가(0,1)
@@ -195,6 +204,7 @@ class Dol {
         this.div.style.top = (this.pos.y * scale) + gap + 'px';
     }
 }
+
 //// 바둑판 크기 조절
 function rescale(val) {// val: z
     scale = Math.max(val, 10);// scale값 덮어쓰기 단 최소값 10
@@ -205,17 +215,20 @@ function rescale(val) {// val: z
         sus[i].restyle();
     }
 }
+
 //// 판 만들기
 function start() {
+    var garo;
+    var sero;
     //// 판 크기 결정
-    for (; ;) {
-        var garo = parseInt(prompt('오목판 가로칸수? (5~50)', 19));
-        if (garo >= 5 && garo <= 50) break;
-    }
-    for (; ;) {
-        var sero = parseInt(prompt('오목판 세로칸수? (5~50)', 19));
-        if (sero >= 5 && sero <= 50) break;
-    }
+    do{
+        garo = parseInt(prompt('오목판 가로칸수? (5~50)', 19));
+    }while(garo >= 5 && garo <= 50);
+
+    do{
+        sero = parseInt(prompt('오목판 세로칸수? (5~50)', 19));
+    }while(sero >= 5 && sero <= 50);
+    
     //// 오목판 객체
     return new Stage(document.getElementById('omokbox'), garo, sero);
 }
@@ -223,4 +236,4 @@ function start() {
 //// 시작
 stage = start();
 
-document.getElementById('colorSign').style.backgroundColor = playerColor[0];// 현재플레이어 표시 초기 색
+document.getElementById('colorSign').style.backgroundColor = playercolor[0];// 현재플레이어 표시 초기 색
