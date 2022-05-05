@@ -38,7 +38,8 @@ class Stage {
         for (var i = 0; i < height; i++) {
             this.a[i] = new Array(width);
         }
-        //// 오목판 태그
+
+        //// 오목판 생성
         this.pan = document.getElementById('omokpan');
         //// 격자 표시용 테이블을 만들어 자손으로 넣기
         this.grid = document.createElement('table');
@@ -52,12 +53,11 @@ class Stage {
                 tr.appendChild(td);
             }
         }
+
         //// 가운데 표시 점
         this.centerPoint = document.createElement('div');
         this.pan.appendChild(this.centerPoint);
-        this.centerPoint.style.position = 'absolute';
-        this.centerPoint.style.backgroundColor = 'grey';
-        this.centerPoint.style.borderRadius = '50%';
+        this.centerPoint.setAttribute('id','omokpanCenterPoint');
 
         this.restyle();// 초기 스타일
 

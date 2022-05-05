@@ -52,3 +52,9 @@
     border: red 3px solid;
     border-radius: 50%;
 }
+
+#omokpanCenterPoint{
+    position: absolute;
+    background-color: gray;
+    border-radius: 50%;
+}
